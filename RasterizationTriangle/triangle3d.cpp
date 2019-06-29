@@ -196,9 +196,7 @@ void Triangle3D::Draw_Line(const Vertex &v0, const Vertex &v1) const
 
 	float dx = v1.pos.x - v0.pos.x;
 	float dy = v1.pos.y - v0.pos.y;
-	float dz = v1.pos.z - v0.pos.z;
 	float dm = abs(dx) > abs(dy) ? abs(dx) : abs(dy);
-	dm = dm > abs(dz) ? dm : abs(dz);
 
 	float dr = v1.color.x - v0.color.x;
 	float dg = v1.color.y - v0.color.y;
@@ -206,23 +204,21 @@ void Triangle3D::Draw_Line(const Vertex &v0, const Vertex &v1) const
 
 	dx /= dm * POINT_DENSITY;
 	dy /= dm * POINT_DENSITY;
-	dz /= dm * POINT_DENSITY;
 
 	dr /= dm * POINT_DENSITY;
 	dg /= dm * POINT_DENSITY;
 	db /= dm * POINT_DENSITY;
 
-	float x = v0.pos.x,   y = v0.pos.y,   z = v0.pos.z;
+	float x = v0.pos.x,   y = v0.pos.y;
 	float r = v0.color.x, g = v0.color.y, b = v0.color.z;
 	float distance = dm * POINT_DENSITY;
 	for (int i = 0; i < distance; i++)
 	{
 		glColor3f(r, g, b);
-		glVertex3f(x, y, z);
+		glVertex2f(x, y);
 
 		x += dx;
 		y += dy;
-		z += dz;
 
 		r += dr;
 		g += dg;
@@ -233,38 +229,31 @@ void Triangle3D::Draw_Line(const Vertex &v0, const Vertex &v1) const
 void Triangle3D::Shader_Line(const Vertex &v0, const Vertex &v1) const
 {
 	float dx = v1.pos.x - v0.pos.x;
-	float dz = v1.pos.z - v0.pos.z;
-	float dm = COMPARE(dx, dz);
+	float dm = abs(dx);
 
 	float dr = v1.color.x - v0.color.x;
 	float dg = v1.color.y - v0.color.y;
 	float db = v1.color.z - v0.color.z;
 
 	dx /= dm * POINT_DENSITY;
-	dz /= dm * POINT_DENSITY;
 
 	dr /= dm * POINT_DENSITY;
 	dg /= dm * POINT_DENSITY;
 	db /= dm * POINT_DENSITY;
 
-	float x = v0.pos.x, y = v0.pos.y, z = v0.pos.z;
+	float x = v0.pos.x, y = v0.pos.y;
 	float r = v0.color.x, g = v0.color.y, b = v0.color.z;
 	float distance = dm * POINT_DENSITY;
 	for (int i = 0; i < distance; i++)
 	{
-		if (x == z)
-		{
-
-		}
 		x += dx;
-		z += dz;
 
 		r += dr;
 		g += dg;
 		b += db;
 
 		glColor3f(r, g, b);
-		glVertex3f(x, y, z);
+		glVertex2f(x, y);
 	}
 }
 
@@ -317,3 +306,80 @@ void Triangle3D::Triangle_Sort(Vertex &temp0, Vertex &temp1, Vertex &temp2) cons
 		}
 	}
 }
+
+//void Triangle3D::Draw_Line(const Vertex &v0, const Vertex &v1) const
+//{
+//
+//	float dx = v1.pos.x - v0.pos.x;
+//	float dy = v1.pos.y - v0.pos.y;
+//	float dz = v1.pos.z - v0.pos.z;
+//	float dm = abs(dx) > abs(dy) ? abs(dx) : abs(dy);
+//	dm = dm > abs(dz) ? dm : abs(dz);
+//
+//	float dr = v1.color.x - v0.color.x;
+//	float dg = v1.color.y - v0.color.y;
+//	float db = v1.color.z - v0.color.z;
+//
+//	dx /= dm * POINT_DENSITY;
+//	dy /= dm * POINT_DENSITY;
+//	dz /= dm * POINT_DENSITY;
+//
+//	dr /= dm * POINT_DENSITY;
+//	dg /= dm * POINT_DENSITY;
+//	db /= dm * POINT_DENSITY;
+//
+//	float x = v0.pos.x, y = v0.pos.y, z = v0.pos.z;
+//	float r = v0.color.x, g = v0.color.y, b = v0.color.z;
+//	float distance = dm * POINT_DENSITY;
+//	for (int i = 0; i < distance; i++)
+//	{
+//		glColor3f(r, g, b);
+//		glVertex3f(x, y, z);
+//
+//		x += dx;
+//		y += dy;
+//		z += dz;
+//
+//		r += dr;
+//		g += dg;
+//		b += db;
+//	}
+//}
+
+//void Triangle3D::Shader_Line(const Vertex &v0, const Vertex &v1) const
+//{
+//	float dx = v1.pos.x - v0.pos.x;
+//	float dz = v1.pos.z - v0.pos.z;
+//	float dm = COMPARE(dx, dz);
+//
+//	float dr = v1.color.x - v0.color.x;
+//	float dg = v1.color.y - v0.color.y;
+//	float db = v1.color.z - v0.color.z;
+//
+//	dx /= dm * POINT_DENSITY;
+//	dz /= dm * POINT_DENSITY;
+//
+//	dr /= dm * POINT_DENSITY;
+//	dg /= dm * POINT_DENSITY;
+//	db /= dm * POINT_DENSITY;
+//
+//	float x = v0.pos.x, y = v0.pos.y, z = v0.pos.z;
+//	float r = v0.color.x, g = v0.color.y, b = v0.color.z;
+//	float distance = dm * POINT_DENSITY;
+//	for (int i = 0; i < distance; i++)
+//	{
+//		if (x == z)
+//		{
+//
+//		}
+//		x += dx;
+//		z += dz;
+//
+//		r += dr;
+//		g += dg;
+//		b += db;
+//
+//		glColor3f(r, g, b);
+//		glVertex3f(x, y, z);
+//	}
+//}

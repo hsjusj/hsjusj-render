@@ -85,14 +85,15 @@ static void RenderScene()
 	m_vertex[3] = { GamePipeline.GetWVTrans() * Vector3f(0.5f, -0.2f, -0.5f), Vector3f(0.0f, 0.0f, 1.0f) };
 	m_vertex[4] = { GamePipeline.GetWVTrans() * Vector3f(0.5f, -0.2f, 0.5f), Vector3f(0.2f, 0.2f, 0.2f) };
 
-	Vertex floor_vertex0(GamePipeline.GetViewTrans() * Vector3f(-1.0f, -0.2f, 10.0f), Vector3f(1.0f, 1.0f, 1.0f));
+	Vertex floor_vertex0(GamePipeline.GetViewTrans() * Vector3f(-1.0f, -0.2f, 5.0f), Vector3f(1.0f, 1.0f, 1.0f));
 	Vertex floor_vertex1(GamePipeline.GetViewTrans() * Vector3f(-1.0f, -0.2f, 0.0f), Vector3f(0.2f, 0.2f, 0.2f));
 	Vertex floor_vertex2(GamePipeline.GetViewTrans() * Vector3f(1.0f, -0.2f, 0.0f), Vector3f(0.2f, 0.2f, 0.2f));
-	Vertex floor_vertex3(GamePipeline.GetViewTrans() * Vector3f(1.0f, -0.2f, 10.0f), Vector3f(0.5f, 0.5f, 0.5f));
+	Vertex floor_vertex3(GamePipeline.GetViewTrans() * Vector3f(1.0f, -0.2f, 5.0f), Vector3f(0.5f, 0.5f, 0.5f));
 	Triangle3D floor(floor_vertex2, floor_vertex1, floor_vertex0);
 	Triangle3D floor2(floor_vertex3, floor_vertex0, floor_vertex2);
 
 	glBegin(GL_POINTS);
+
 	render_list.AddTriangle(floor);
 	render_list.AddTriangle(floor2);
 
@@ -101,7 +102,6 @@ static void RenderScene()
 		triangles[i] = Triangle3D(m_vertex[m_index[j]], m_vertex[m_index[j + 1]], m_vertex[m_index[j + 2]]);
 		render_list.AddTriangle(triangles[i]);
 	}
-
 
 	render_list.Render();
 
@@ -118,6 +118,7 @@ static void SetUpRC()
 	printf("ad旋转  ws控制环境光光照强度   上下左右键移动摄像机\n");
 	printf("\n此次更新如下:\n");
 	printf("1.对不在视野内的物体进行剔除，并实现了近平面裁剪\n");
+	printf("2.突然发现在绘图时忽略z坐标没有任何影响，遂将glColor3f修改为glColor2f，不再进行z坐标计算\n");
 	printf("\n在此感谢以下书籍带来的帮助\n");
 	printf("--《c++ Primer》\n");
 	printf("--《线性代数及其应用》\n");
