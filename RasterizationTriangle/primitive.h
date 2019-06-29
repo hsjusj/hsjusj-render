@@ -23,10 +23,14 @@ private:
 class Triangle3D
 {
 public:
-	Triangle3D(const Vertex&, const Vertex&, const Vertex&);
+	Triangle3D() = default;
+	Triangle3D(const Vertex&, const Vertex&, const Vertex&, bool = false);
+	Triangle3D(const Triangle3D&);
+	Triangle3D &operator=(const Triangle3D&);
 	void Show();
 private:
 	Vertex v0, v1, v2;
+	bool face_render = true;
 	void Triangle_Sort(Vertex&, Vertex&, Vertex&);
 	void Raster();
 	void Draw_Line(const Vertex&, const Vertex&);

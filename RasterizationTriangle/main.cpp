@@ -4,6 +4,7 @@
 
 #include <cstdio>
 #include <cstdlib>
+#include <conio.h>
 #include <cmath>
 
 #include "math_3d.h"
@@ -15,10 +16,19 @@
 
 int Point_Density = 10;
 
+float rotate_scale = 0.0f;
+
+//视线
+Vector3f Eye(0.0f, 0.0f, 1.0f);
 //透视投影信息
 PersProjInfo p;
 //渲染管线
 Pipeline GamePipeline;
+//四棱锥
+Vertex m_vertex[5];
+Triangle3D t_list[4];
+//索引
+int m_index[12];
 
 int main(int argc, char **argv)
 {
@@ -30,7 +40,8 @@ int main(int argc, char **argv)
 	//gluOrtho2D(-WINDOW_WIDTH / 2, WINDOW_WIDTH / 2, -WINDOW_HEIGHT / 2, WINDOW_HEIGHT / 2);
 
 	glutDisplayFunc(RenderScene);
-	glutKeyboardFunc(KeyBoardCB);
+	glutKeyboardFunc(NormalKeyBoardCB);
+	glutSpecialFunc(SpecialKeyBoardCB);
 	glutIdleFunc(RenderScene);
 
 	glColor3f(1.0f, 1.0f, 0.0f);
@@ -48,7 +59,7 @@ int main(int argc, char **argv)
 
 	//设置为线框模式
 	//PolygonMode(HS_LINE);
-
+	SetUpRC();
 	glutMainLoop();
 	return 0;
 }
@@ -57,22 +68,26 @@ static void RenderScene()
 {
 	glClear(GL_COLOR_BUFFER_BIT);
 
-	static float Scale = 0.0f;
+	GamePipeline.WorldPos(0.0f, 0.0f, 3.0f);
+	GamePipeline.Rotate(Vector3f(0.0f, rotate_scale, 0.0f));
 
-	Matrix4f rotateMatrix, totalMatrix;
-	rotateMatrix.InitRotateTransform(0.0f, Scale, 0.0f);
+	m_vertex[0] = { GamePipeline.GetWPTrans() * Vector3f(0.0f, 0.7f, 0.0f), Vector3f(1.0f, 1.0f, 1.0f) };
+	m_vertex[1] = { GamePipeline.GetWPTrans() * Vector3f(-0.5f, -0.5f, 0.5f), Vector3f(1.0f, 0.0f, 0.0f) };
+	m_vertex[2] = { GamePipeline.GetWPTrans() * Vector3f(-0.5f, -0.5f, -0.5f), Vector3f(0.0f, 1.0f, 0.0f) };
+	m_vertex[3] = { GamePipeline.GetWPTrans() * Vector3f(0.5f, -0.5f, -0.5f), Vector3f(0.0f, 0.0f, 1.0f) };
+	m_vertex[4] = { GamePipeline.GetWPTrans() * Vector3f(0.5f, -0.5f, 0.5f), Vector3f(0.2f, 0.2f, 0.2f) };
 
-	Vertex v0(rotateMatrix*Vector3f(-0.5f, -0.5f, 0.0f), Vector3f(0.1f, 0.1f, 0.1f));
-	Vertex v1(rotateMatrix*Vector3f(0.0f, 0.5f, 0.0f), Vector3f(1.0f, 1.0f, 1.0f));
-	Vertex v2(rotateMatrix*Vector3f(0.5f, -0.7f, 0.0f), Vector3f(0.1f, 0.1f, 0.1f));
-	Triangle3D t0(v0, v1, v2);
-
+	for (unsigned int i = 0, j = 0; i < 4; i++, j += 3)
+	{
+		t_list[i] = Triangle3D(m_vertex[m_index[j]], m_vertex[m_index[j + 1]], m_vertex[m_index[j + 2]]);
+	}
 
 	glBegin(GL_POINTS);
-
-	Scale += 1.1f;
 	
-	t0.Show();
+	for (unsigned int i = 0; i < 4; i++)
+	{
+		t_list[i].Show();
+	}
 
 	glEnd();
 
@@ -81,8 +96,38 @@ static void RenderScene()
 
 void SetUpRC()
 {
+
+	printf("F1 退出\n");
+	printf("F2 变换模式\n");
+	printf("ad旋转\n");
+	printf("\n在此感谢以下书籍带来的帮助\n");
+	printf("--《c++ Primer》\n");
+	printf("--《线性代数及其应用》\n");
+	printf("--《3D数学基础：图形与游戏开发》\n");
+	printf("--《游戏引擎架构》\n");
+	printf("--《Windows游戏编程大师技巧》\n");
+	printf("--《3D游戏编程大师技巧》\n");
+
+
 	SetPersProjInfo(p);
 	GamePipeline.SetPerspectiveProj(p);
+
+	m_vertex[0] = { Vector3f(0.0f, 0.7f, 0.0f), Vector3f(1.0f, 1.0f, 1.0f) };
+	m_vertex[1] = { Vector3f(-0.5f, -0.5f, 0.5f), Vector3f(0.2f, 0.2f, 0.2f) };
+	m_vertex[2] = { Vector3f(-0.5f, -0.5f, -0.5f), Vector3f(0.2f, 0.2f, 0.2f) };
+	m_vertex[3] = { Vector3f(0.5f, -0.5f, -0.5f), Vector3f(0.2f, 0.2f, 0.2f) };
+	m_vertex[4] = { Vector3f(0.5f, -0.5f, 0.5f), Vector3f(0.2f, 0.2f, 0.2f) };
+
+	m_index[0] = 0; m_index[1] = 1; m_index[2] = 2;
+	m_index[3] = 0; m_index[4] = 2; m_index[5] = 3;
+	m_index[6] = 0; m_index[7] = 3; m_index[8] = 4;
+	m_index[9] = 0; m_index[10] = 4; m_index[11] = 1;
+
+
+	//for (unsigned int i = 0, j = 0; i < 4; i++, j += 3)
+	//{
+	//	t_list[i] = Triangle3D(m_vertex[m_index[j]], m_vertex[m_index[j + 1]], m_vertex[m_index[j + 2]]);
+	//}
 }
 
 void DDA_2d(const Vector2f &v0, const Vector2f &v1)
@@ -139,17 +184,41 @@ void DDA_3d(const Vector3f &v0, const Vector3f &v1)
 	}
 }
 
-void KeyBoardCB(unsigned char key, int x, int y)
+//glutSpecialFunc(SpecialKeyboardCB);
+
+void SpecialKeyBoardCB(int key, int x, int y)
+{
+	switch (key)
+	{
+	case GLUT_KEY_F2:
+		if (shader_mode & HS_FACE)
+		{
+			PolygonMode(HS_LINE);
+		}
+		else if (shader_mode & HS_LINE)
+		{
+			PolygonMode(HS_NO_FACE);
+		}
+		else if (shader_mode & HS_NO_FACE)
+		{
+			PolygonMode(HS_FACE);
+		}
+		break;
+	case GLUT_KEY_F1:
+		exit(0);
+		break;
+	}
+}
+
+void NormalKeyBoardCB(unsigned char key, int x, int y)
 {
 	switch (key)
 	{
 	case 'd':
-		Point_Density += 1;
-		printf("Point_Density : %d\n", Point_Density);
+		rotate_scale += 1.0f;
 		break;
 	case 'a':
-		Point_Density -= 1;
-		printf("Point_Density : %d\n", Point_Density);
+		rotate_scale -= 1.0f;
 		break;
 	}
 }
@@ -159,6 +228,6 @@ void SetPersProjInfo(PersProjInfo &p)
 	p.FOV = 35.0f;
 	p.Width = WINDOW_WIDTH;
 	p.Height = WINDOW_HEIGHT;
-	p.zNear = 0.1f;
+	p.zNear = 0.5f;
 	p.zFar = 100.0f;
 }

@@ -1,11 +1,19 @@
 #include "state_machine.h"
 
-bool line_mode = false;
+int shader_mode = HS_FACE;
 
 void PolygonMode(int mode)
 {
-	if (mode == HS_LINE)
+	if (mode & HS_FACE)
 	{
-		line_mode = true;
+		shader_mode = HS_FACE;
+	}
+	else if (mode & HS_LINE)
+	{
+		shader_mode = HS_LINE;
+	}
+	else if (mode & HS_NO_FACE)
+	{
+		shader_mode = HS_NO_FACE;
 	}
 }

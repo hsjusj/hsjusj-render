@@ -1,6 +1,6 @@
 #include "pipeline.h"
 
-Pipeline::Pipeline()
+Pipeline::Pipeline() : m_scale(Vector3f(1.0f, 1.0f, 1.0f))
 {
 
 }
@@ -43,7 +43,7 @@ void Pipeline::Rotate(const Vector3f &r)
 void Pipeline::SetPerspectiveProj(const PersProjInfo &p)
 {
 	m_persProjInfo = p;
-	m_Wtransformation.InitPersProjTransform(m_persProjInfo);
+	m_ProjTransformation.InitPersProjTransform(m_persProjInfo);
 }
 
 const Matrix4f &Pipeline::GetProjTrans()

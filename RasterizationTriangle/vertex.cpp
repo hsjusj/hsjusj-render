@@ -10,7 +10,7 @@ Vertex::Vertex(const Vertex &v0) : pos(v0.pos), color(v0.color), normal(v0.norma
 
 }
 
-Vertex::Vertex(const Vector3f &v0) : pos(v0)
+Vertex::Vertex(const Vector3f &pos0) : pos(pos0), color(Vector3f(1.0f, 1.0f, 1.0f))
 {
 
 }

@@ -9,9 +9,11 @@
 
 //#define CHANGE_DENSITY  //可变画线密集程度
 extern int Point_Density;
+extern Vector3f Eye;
 
 void RenderScene();
-void KeyBoardCB(unsigned char key, int x, int y);
+void NormalKeyBoardCB(unsigned char key, int x, int y);
+void SpecialKeyBoardCB(int key, int x, int y);
 
 void SetUpRC();
 void SetPersProjInfo(PersProjInfo &p);

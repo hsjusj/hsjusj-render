@@ -1,23 +1,64 @@
 #include "primitive.h"
 #include <cstdio>
 
-Triangle3D::Triangle3D(const Vertex &vertex0, const Vertex &vertex1, const Vertex &vertex2) : v0(vertex0), v1(vertex1), v2(vertex2)
+Triangle3D::Triangle3D(const Vertex &vertex0, const Vertex &vertex1, const Vertex &vertex2, bool state_render) : v0(vertex0), v1(vertex1), v2(vertex2)
 {
-	v0.pos = v0.pos.To3D();
-	v1.pos = v1.pos.To3D();
-	v2.pos = v2.pos.To3D();
+	Vector3f edg0 = v1.pos - v0.pos;
+	Vector3f edg1 = v2.pos - v1.pos;
+
+	if (shader_mode & HS_FACE)
+	{
+		if (!state_render)
+		{
+			float normal = edg0.Cross(edg1) * Eye;
+			if (normal <= 0.8f)
+			{
+				face_render = false;
+			}
+		}
+	}
+
+	v0.pos = vertex0.pos.To3D();
+	v1.pos = vertex1.pos.To3D();
+	v2.pos = vertex2.pos.To3D();
+}
+
+Triangle3D::Triangle3D(const Triangle3D &t3d) : v0(t3d.v0), v1(t3d.v1), v2(t3d.v2), face_render(t3d.face_render)
+{
+
+}
+
+Triangle3D &Triangle3D::operator=(const Triangle3D &t3d)
+{
+	v0 = t3d.v0;
+	v1 = t3d.v1;
+	v2 = t3d.v2;
+
+	Vector3f edg0 = v1.pos - v0.pos;
+	Vector3f edg1 = v2.pos - v1.pos;
+
+	face_render = t3d.face_render;
+
+	return *this;
 }
 
 void Triangle3D::Show()
 {
-	Draw_Line(v0, v1);
-	Draw_Line(v1, v2);
-	Draw_Line(v2, v0);
-	//如果为线框模式则不为多边形进行填充
-	if (line_mode)
+	if (!face_render)
 	{
 		return;
 	}
+
+	Draw_Line(v0, v1);
+	Draw_Line(v1, v2);
+	Draw_Line(v2, v0);
+
+	//如果为线框模式则不为多边形进行填充
+	if (shader_mode & HS_LINE)
+	{
+		return;
+	}
+
 	//高洛德着色
 	Raster();
 }
@@ -25,7 +66,8 @@ void Triangle3D::Show()
 void Triangle3D::Raster()
 {
 	Vertex temp0, temp1, temp2;
-
+	//printf("%f %f %f\n", v0.pos.y, v1.pos.y, v2.pos.y);
+	//system("pause");
 	if (v0.pos.y != v1.pos.y && v1.pos.y != v2.pos.y && v0.pos.y != v2.pos.y)
 	{
 		//三角形排序
@@ -42,9 +84,10 @@ void Triangle3D::Raster()
 		new_vertex.color.x = temp0.color.x + (temp2.color.x - temp0.color.x) * t;
 		new_vertex.color.y = temp0.color.y + (temp2.color.y - temp0.color.y) * t;
 		new_vertex.color.z = temp0.color.z + (temp2.color.z - temp0.color.z) * t;
-
-		Triangle3D t0(temp0, temp1, new_vertex);
-		Triangle3D t1(temp1, temp2, new_vertex);
+		//new_vertex.pos.w = 1.0f;
+		//printf("%f\n", temp2.pos.w);
+		Triangle3D t0(temp0, temp1, new_vertex, true);
+		Triangle3D t1(temp1, temp2, new_vertex, true);
 		t0.Show();
 		t1.Show();
 		return;

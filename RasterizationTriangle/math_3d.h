@@ -38,11 +38,16 @@ public:
 	Vector3f &operator+=(const Vector3f&);
 	Vector3f &operator-=(const Vector3f&);
 
+	float operator*(const Vector3f&) const;
+
 	bool operator==(const Vector3f&);
 	bool operator!=(const Vector3f&);
 
 	Vector3f &Normalize();
-	Vector3f To3D()const;
+	Vector3f Cross(const Vector3f&) const;
+	Vector3f To3D() const;
+
+	void Print() const;
 };
 
 struct PersProjInfo

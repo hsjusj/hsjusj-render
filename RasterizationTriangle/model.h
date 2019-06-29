@@ -2,13 +2,7 @@
 
 #define MODEL_H__
 
-class Plane
-{
-public:
-	Plane();
-private:
-	int Width;
-	int Height;
-};
+#include "math_3d.h"
+
 
 #endif
