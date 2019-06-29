@@ -1,5 +1,4 @@
 #include "primitive.h"
-#include <cstdio>
 Triangle2D::Triangle2D(const Vector2f &temp0, const Vector2f &temp1, const Vector2f &temp2) : v0(temp0), v1(temp1), v2(temp2)
 {
 
@@ -7,9 +6,9 @@ Triangle2D::Triangle2D(const Vector2f &temp0, const Vector2f &temp1, const Vecto
 
 void Triangle2D::Show()
 {
-	DDA_2d(v0, v1);
-	DDA_2d(v1, v2);
-	DDA_2d(v2, v0);
+	Draw_Line(v0, v1);
+	Draw_Line(v1, v2);
+	Draw_Line(v2, v0);
 
 	Raster();
 }
@@ -135,11 +134,41 @@ void Triangle2D::Raster()
 #endif
 	for (int i = 0; i < distance; i++)
 	{
-		DDA_2d(vs, ve);
+		Draw_Line(vs, ve);
 		vs.x += dx_left;
 		ve.x += dx_right;
 
 		vs.y -= dy;
 		ve.y -= dy;
 	}
+}
+
+void Triangle2D::Draw_Line(const Vector2f &v0, const Vector2f &v1)
+{
+	float dx = v1.x - v0.x;
+	float dy = v1.y - v0.y;
+	float dm = abs(dx) > abs(dy) ? abs(dx) : abs(dy);
+#ifndef CHANGE_DENSITY
+	dx /= (dm * POINT_DENSITY);
+	dy /= (dm * POINT_DENSITY);
+	float x = v0.x, y = v0.y;
+	for (int i = 0; i < dm * POINT_DENSITY; i++)
+	{
+		glColor3f(1.0f - x, y + 0.5f, 0.5f);
+		glVertex2f(x, y);
+		x += dx;
+		y += dy;
+	}
+#else
+	dx /= (dm * Point_Density);
+	dy /= (dm * Point_Density);
+	float x = v0.x, y = v0.y;
+	for (int i = 0; i < dm * Point_Density; i++)
+	{
+		glColor3f(1.0f - x, y + 0.1f, 0.8f);
+		glVertex2f(x, y);
+		x += dx;
+		y += dy;
+	}
+#endif
 }

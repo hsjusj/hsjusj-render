@@ -1,45 +1,67 @@
 #include "primitive.h"
 #include <cstdio>
 
-Triangle3D::Triangle3D(const Vertex &vertex0, const Vertex &vertex1, const Vertex &vertex2, bool state_render) : v0(vertex0), v1(vertex1), v2(vertex2)
+Triangle3D::Triangle3D(const Vertex &vertex0, const Vertex &vertex1, const Vertex &vertex2, bool state_render) : m_v0(vertex0), m_v1(vertex1), m_v2(vertex2)
 {
-	Vector3f edg0 = v1.pos - v0.pos;
-	Vector3f edg1 = v2.pos - v1.pos;
+	Vector3f edg0 = m_v1.pos - m_v0.pos;
+	Vector3f edg1 = m_v2.pos - m_v1.pos;
 
-	if (shader_mode & HS_FACE)
+	m_vs[0] = m_v0;
+	m_vs[1] = m_v1;
+	m_vs[2] = m_v2;
+
+	if (shader_mode & RENDER_MODE_FACE)
 	{
 		if (!state_render)
 		{
-			float normal = edg0.Cross(edg1) * Eye;
-			if (normal <= 0.8f)
+			float normal = edg0.Cross(edg1).Normalize() * Eye.Normalize();
+			if (normal < 0.0f)
 			{
 				face_render = false;
 			}
 		}
 	}
 
-	v0.pos = vertex0.pos.To3D();
-	v1.pos = vertex1.pos.To3D();
-	v2.pos = vertex2.pos.To3D();
+	//环境光
+	m_v0.color *= Intensity;
+	m_v1.color *= Intensity;
+	m_v2.color *= Intensity;
 }
 
-Triangle3D::Triangle3D(const Triangle3D &t3d) : v0(t3d.v0), v1(t3d.v1), v2(t3d.v2), face_render(t3d.face_render)
+Triangle3D::Triangle3D(const Triangle3D &t3d) : m_v0(t3d.m_v0), m_v1(t3d.m_v1), m_v2(t3d.m_v2), face_render(t3d.face_render)
 {
-
+	m_vs[0] = m_v0;
+	m_vs[1] = m_v1;
+	m_vs[2] = m_v2;
 }
 
 Triangle3D &Triangle3D::operator=(const Triangle3D &t3d)
 {
-	v0 = t3d.v0;
-	v1 = t3d.v1;
-	v2 = t3d.v2;
+	m_v0 = t3d.m_v0;
+	m_v1 = t3d.m_v1;
+	m_v2 = t3d.m_v2;
 
-	Vector3f edg0 = v1.pos - v0.pos;
-	Vector3f edg1 = v2.pos - v1.pos;
+	m_vs[0] = m_v0;
+	m_vs[1] = m_v1;
+	m_vs[2] = m_v2;
+
+	Vector3f edg0 = m_v1.pos - m_v0.pos;
+	Vector3f edg1 = m_v2.pos - m_v1.pos;
 
 	face_render = t3d.face_render;
 
 	return *this;
+}
+
+Triangle3D Triangle3D::operator*(const Matrix4f &m4f) const
+{
+	Vertex v0 = m_v0;
+	Vertex v1 = m_v1;
+	Vertex v2 = m_v2;
+	v0.pos = m4f * m_v0.pos;
+	v1.pos = m4f * m_v1.pos;
+	v2.pos = m4f * m_v2.pos;
+	return Triangle3D(v0, v1, v2);
 }
 
 void Triangle3D::Show()
@@ -49,12 +71,16 @@ void Triangle3D::Show()
 		return;
 	}
 
-	Draw_Line(v0, v1);
-	Draw_Line(v1, v2);
-	Draw_Line(v2, v0);
+	m_v0.pos = m_v0.pos.To3D();
+	m_v1.pos = m_v1.pos.To3D();
+	m_v2.pos = m_v2.pos.To3D();
+
+	Draw_Line(m_v0, m_v1);
+	Draw_Line(m_v1, m_v2);
+	Draw_Line(m_v2, m_v0);
 
 	//如果为线框模式则不为多边形进行填充
-	if (shader_mode & HS_LINE)
+	if (shader_mode & RENDER_MODE_LINE)
 	{
 		return;
 	}
@@ -63,12 +89,10 @@ void Triangle3D::Show()
 	Raster();
 }
 
-void Triangle3D::Raster()
+void Triangle3D::Raster() const
 {
 	Vertex temp0, temp1, temp2;
-	//printf("%f %f %f\n", v0.pos.y, v1.pos.y, v2.pos.y);
-	//system("pause");
-	if (v0.pos.y != v1.pos.y && v1.pos.y != v2.pos.y && v0.pos.y != v2.pos.y)
+	if (m_v0.pos.y != m_v1.pos.y && m_v1.pos.y != m_v2.pos.y && m_v0.pos.y != m_v2.pos.y)
 	{
 		//三角形排序
 		Triangle_Sort(temp0, temp1, temp2);
@@ -84,31 +108,29 @@ void Triangle3D::Raster()
 		new_vertex.color.x = temp0.color.x + (temp2.color.x - temp0.color.x) * t;
 		new_vertex.color.y = temp0.color.y + (temp2.color.y - temp0.color.y) * t;
 		new_vertex.color.z = temp0.color.z + (temp2.color.z - temp0.color.z) * t;
-		//new_vertex.pos.w = 1.0f;
-		//printf("%f\n", temp2.pos.w);
 		Triangle3D t0(temp0, temp1, new_vertex, true);
 		Triangle3D t1(temp1, temp2, new_vertex, true);
 		t0.Show();
 		t1.Show();
 		return;
 	}
-	if (v0.pos.y == v1.pos.y)
+	if (m_v0.pos.y == m_v1.pos.y)
 	{
-		temp0 = v2;
-		temp1 = v0;
-		temp2 = v1;
+		temp0 = m_v2;
+		temp1 = m_v0;
+		temp2 = m_v1;
 	}
-	else if (v1.pos.y == v2.pos.y)
+	else if (m_v1.pos.y == m_v2.pos.y)
 	{
-		temp0 = v0;
-		temp1 = v1;
-		temp2 = v2;
+		temp0 = m_v0;
+		temp1 = m_v1;
+		temp2 = m_v2;
 	}
-	else if (v0.pos.y == v2.pos.y)
+	else if (m_v0.pos.y == m_v2.pos.y)
 	{
-		temp0 = v1;
-		temp1 = v2;
-		temp2 = v0;
+		temp0 = m_v1;
+		temp1 = m_v2;
+		temp2 = m_v0;
 	}
 
 	Vertex v0(temp0), v1(temp1), v2(temp2);
@@ -152,7 +174,7 @@ void Triangle3D::Raster()
 	float Distance = abs(v0.pos.y - v1.pos.y) * POINT_DENSITY;
 	for (int i = 0; i < Distance; i++)
 	{
-		Draw_Line(ve, vs);
+		Shader_Line(ve, vs);
 		ve.pos.x += left_dx;
 		ve.pos.y += dy;
 		ve.pos.z += left_dz;
@@ -169,7 +191,7 @@ void Triangle3D::Raster()
 	}
 }
 
-void Triangle3D::Draw_Line(const Vertex &v0, const Vertex &v1)
+void Triangle3D::Draw_Line(const Vertex &v0, const Vertex &v1) const
 {
 
 	float dx = v1.pos.x - v0.pos.x;
@@ -208,52 +230,90 @@ void Triangle3D::Draw_Line(const Vertex &v0, const Vertex &v1)
 	}
 }
 
-void Triangle3D::Triangle_Sort(Vertex &temp0, Vertex &temp1, Vertex &temp2)
+void Triangle3D::Shader_Line(const Vertex &v0, const Vertex &v1) const
 {
-	if (v0.pos.y > v1.pos.y)
+	float dx = v1.pos.x - v0.pos.x;
+	float dz = v1.pos.z - v0.pos.z;
+	float dm = COMPARE(dx, dz);
+
+	float dr = v1.color.x - v0.color.x;
+	float dg = v1.color.y - v0.color.y;
+	float db = v1.color.z - v0.color.z;
+
+	dx /= dm * POINT_DENSITY;
+	dz /= dm * POINT_DENSITY;
+
+	dr /= dm * POINT_DENSITY;
+	dg /= dm * POINT_DENSITY;
+	db /= dm * POINT_DENSITY;
+
+	float x = v0.pos.x, y = v0.pos.y, z = v0.pos.z;
+	float r = v0.color.x, g = v0.color.y, b = v0.color.z;
+	float distance = dm * POINT_DENSITY;
+	for (int i = 0; i < distance; i++)
 	{
-		temp0 = v0;
-		if (temp0.pos.y > v2.pos.y)
+		if (x == z)
 		{
-			if (v2.pos.y > v1.pos.y)
+
+		}
+		x += dx;
+		z += dz;
+
+		r += dr;
+		g += dg;
+		b += db;
+
+		glColor3f(r, g, b);
+		glVertex3f(x, y, z);
+	}
+}
+
+void Triangle3D::Triangle_Sort(Vertex &temp0, Vertex &temp1, Vertex &temp2) const
+{
+	if (m_v0.pos.y > m_v1.pos.y)
+	{
+		temp0 = m_v0;
+		if (temp0.pos.y > m_v2.pos.y)
+		{
+			if (m_v2.pos.y > m_v1.pos.y)
 			{
-				temp1 = v2;
-				temp2 = v1;
+				temp1 = m_v2;
+				temp2 = m_v1;
 			}
 			else
 			{
-				temp1 = v1;
-				temp2 = v2;
+				temp1 = m_v1;
+				temp2 = m_v2;
 			}
 		}
 		else
 		{
-			temp0 = v2;
-			temp1 = v0;
-			temp2 = v1;
+			temp0 = m_v2;
+			temp1 = m_v0;
+			temp2 = m_v1;
 		}
 	}
 	else
 	{
-		temp0 = v1;
-		if (temp0.pos.y > v2.pos.y)
+		temp0 = m_v1;
+		if (temp0.pos.y > m_v2.pos.y)
 		{
-			if (v0.pos.y > v2.pos.y)
+			if (m_v0.pos.y > m_v2.pos.y)
 			{
-				temp1 = v0;
-				temp2 = v2;
+				temp1 = m_v0;
+				temp2 = m_v2;
 			}
 			else
 			{
-				temp1 = v2;
-				temp2 = v0;
+				temp1 = m_v2;
+				temp2 = m_v0;
 			}
 		}
 		else
 		{
-			temp0 = v2;
-			temp1 = v1;
-			temp2 = v0;
+			temp0 = m_v2;
+			temp1 = m_v1;
+			temp2 = m_v0;
 		}
 	}
 }

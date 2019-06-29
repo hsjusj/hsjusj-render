@@ -27,3 +27,17 @@ Vertex &Vertex::operator=(const Vertex &v0)
 	normal = v0.normal;
 	return *this;
 }
+
+static float Fast_SquareRT(float f)
+{
+	float result;
+	_asm
+	{
+		mov eax, f
+			sub eax, 0x3f800000
+			sar eax, 1
+			add eax, 0x3f800000
+			mov result, eax
+	}
+	return result;
+}

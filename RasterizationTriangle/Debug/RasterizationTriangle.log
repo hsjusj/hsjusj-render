@@ -1,14 +1,25 @@
-﻿生成启动时间为 2017/9/25 22:18:19。
+﻿生成启动时间为 2017/10/12 14:26:42。
      1>项目“D:\hsjusj2\OpenglProject\RasterizationTriangle\RasterizationTriangle\RasterizationTriangle.vcxproj”在节点 2 上(Build 个目标)。
      1>InitializeBuildStatus:
          正在创建“Debug\Rasteriz.6E7AB0EF.tlog\unsuccessfulbuild”，因为已指定“AlwaysCreate”。
        ClCompile:
-         D:\microsoft visual studio\VC\bin\CL.exe /c /ZI /nologo /W3 /WX- /sdl /Od /Oy- /D _MBCS /Gm /EHsc /RTC1 /MDd /GS /fp:precise /Zc:wchar_t /Zc:forScope /Fo"Debug\\" /Fd"Debug\vc120.pdb" /Gd /TP /analyze- /errorReport:prompt main.cpp
+         D:\microsoft visual studio\VC\bin\CL.exe /c /ZI /nologo /W3 /WX- /sdl /Od /Oy- /D _MBCS /Gm /EHsc /RTC1 /MDd /GS /fp:precise /Zc:wchar_t /Zc:forScope /Fo"Debug\\" /Fd"Debug\vc120.pdb" /Gd /TP /analyze- /errorReport:prompt camera.cpp main.cpp pipeline.cpp renderlist.cpp triangle2d.cpp triangle3d.cpp
+         camera.cpp
+         正在生成代码...
+         正在编译...
+         triangle3d.cpp
+         triangle2d.cpp
+         renderlist.cpp
+     1>d:\hsjusj2\openglproject\rasterizationtriangle\rasterizationtriangle\renderlist.cpp(188): warning C4018: “<”: 有符号/无符号不匹配
+         pipeline.cpp
          main.cpp
+         正在生成代码...
        Link:
-         D:\microsoft visual studio\VC\bin\link.exe /ERRORREPORT:PROMPT /OUT:"D:\hsjusj2\OpenglProject\RasterizationTriangle\Debug\RasterizationTriangle.exe" /INCREMENTAL /NOLOGO glew32.lib kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /MANIFEST /MANIFESTUAC:"level='asInvoker' uiAccess='false'" /manifest:embed /DEBUG /PDB:"D:\hsjusj2\OpenglProject\RasterizationTriangle\Debug\RasterizationTriangle.pdb" /TLBID:1 /DYNAMICBASE /NXCOMPAT /IMPLIB:"D:\hsjusj2\OpenglProject\RasterizationTriangle\Debug\RasterizationTriangle.lib" /MACHINE:X86 Debug\main.obj
+         D:\microsoft visual studio\VC\bin\link.exe /ERRORREPORT:PROMPT /OUT:"D:\hsjusj2\OpenglProject\RasterizationTriangle\Debug\RasterizationTriangle.exe" /INCREMENTAL /NOLOGO glew32.lib kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /MANIFEST /MANIFESTUAC:"level='asInvoker' uiAccess='false'" /manifest:embed /DEBUG /PDB:"D:\hsjusj2\OpenglProject\RasterizationTriangle\Debug\RasterizationTriangle.pdb" /TLBID:1 /DYNAMICBASE /NXCOMPAT /IMPLIB:"D:\hsjusj2\OpenglProject\RasterizationTriangle\Debug\RasterizationTriangle.lib" /MACHINE:X86 Debug\camera.obj
+         Debug\main.obj
          Debug\matrix4f.obj
          Debug\pipeline.obj
+         Debug\renderlist.obj
          Debug\state_machine.obj
          Debug\triangle2d.obj
          Debug\triangle3d.obj
@@ -23,4 +34,4 @@
 
 生成成功。
 
-已用时间 00:00:00.76
+已用时间 00:00:02.89

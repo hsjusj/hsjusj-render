@@ -48,6 +48,12 @@
     <ClCompile Include="vertex.cpp">
       <Filter>源文件\math_3d</Filter>
     </ClCompile>
+    <ClCompile Include="camera.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="renderlist.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="math_3d.h">
@@ -62,10 +68,13 @@
     <ClInclude Include="pipeline.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="model.h">
+    <ClInclude Include="state_machine.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="state_machine.h">
+    <ClInclude Include="camera.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="renderlist.h">
       <Filter>头文件</Filter>
     </ClInclude>
   </ItemGroup>
